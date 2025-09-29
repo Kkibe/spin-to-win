@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spin to Win - M-Pesa</title>
+    <title>Spin to Win - M-Pesa Rewards</title>
     <style>
         * {
             margin: 0;
@@ -11,63 +11,96 @@
             box-sizing: border-box;
         }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             overflow: hidden;
+            background: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            height: 60px;
         }
         #app-frame {
             width: 100%;
-            height: 100vh;
+            height: calc(100vh - 60px);
             border: none;
             display: block;
+            margin-top: 60px;
         }
-        .loading {
+        .loading-container {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
         }
         .spinner {
             border: 4px solid #f3f3f3;
             border-radius: 50%;
             border-top: 4px solid #667eea;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            margin-bottom: 1rem;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .loading-text {
+            color: #333;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
-    <div class="loading" id="loading">
+    <div class="header">
+        <h1>Spin to Win - M-Pesa Rewards</h1>
+    </div>
+
+    <div class="loading-container" id="loading">
         <div class="spinner"></div>
-        <p>Loading Spin & Win App...</p>
+        <p class="loading-text">Loading your Spin & Win experience...</p>
     </div>
     
     <iframe 
         id="app-frame"
         src="https://spin-and-win-to-mpesa-api-1089664169997.europe-west1.run.app/"
         title="Spin to Win M-Pesa App"
-        onload="document.getElementById('loading').style.display = 'none';"
+        onload="hideLoading()"
         allow="payment *"
         sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation"
     ></iframe>
 
     <script>
-        // Hide loading spinner when iframe loads
-        document.getElementById('app-frame').addEventListener('load', function() {
-            document.getElementById('loading').style.display = 'none';
-        });
+        function hideLoading() {
+            const loading = document.getElementById('loading');
+            loading.style.opacity = '0';
+            setTimeout(() => {
+                loading.style.display = 'none';
+            }, 500);
+        }
         
-        // Show loading if iframe takes time
-        setTimeout(function() {
-            document.getElementById('loading').style.display = 'none';
-        }, 3000);
+        // Fallback: hide loading after 5 seconds max
+        setTimeout(hideLoading, 5000);
+        
+        // Handle iframe errors
+        document.getElementById('app-frame').addEventListener('error', function() {
+            hideLoading();
+            alert('Failed to load the application. Please try refreshing the page.');
+        });
     </script>
 </body>
 </html>
